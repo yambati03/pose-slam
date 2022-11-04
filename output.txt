@@ -1,0 +1,204 @@
+Percent progress: 1.0%
+Percent progress: 2.0%
+Percent progress: 3.0%
+Percent progress: 4.0%
+Percent progress: 5.0%
+Percent progress: 6.0%
+Percent progress: 7.000000000000001%
+Percent progress: 8.0%
+Percent progress: 9.0%
+Percent progress: 10.0%
+Percent progress: 11.0%
+Percent progress: 12.0%
+Percent progress: 13.0%
+Percent progress: 14.000000000000002%
+Percent progress: 15.0%
+Percent progress: 16.0%
+Percent progress: 17.0%
+Percent progress: 18.0%
+Percent progress: 19.0%
+Percent progress: 20.0%
+Percent progress: 21.0%
+Percent progress: 22.0%
+Percent progress: 23.0%
+Percent progress: 24.0%
+Percent progress: 25.0%
+Percent progress: 26.0%
+Percent progress: 27.0%
+Percent progress: 28.000000000000004%
+Percent progress: 28.999999999999996%
+Percent progress: 30.0%
+Percent progress: 31.0%
+Percent progress: 32.0%
+Percent progress: 33.0%
+Percent progress: 34.0%
+Percent progress: 35.0%
+Percent progress: 36.0%
+Percent progress: 37.0%
+Percent progress: 38.0%
+Percent progress: 39.0%
+Percent progress: 40.0%
+Percent progress: 41.0%
+Percent progress: 42.0%
+Percent progress: 43.0%
+Percent progress: 44.0%
+Percent progress: 45.0%
+Percent progress: 46.0%
+Percent progress: 47.0%
+Percent progress: 48.0%
+Percent progress: 49.0%
+Percent progress: 50.0%
+Percent progress: 51.0%
+Percent progress: 52.0%
+Percent progress: 53.0%
+Percent progress: 54.0%
+Percent progress: 55.00000000000001%
+Percent progress: 56.00000000000001%
+Percent progress: 56.99999999999999%
+Percent progress: 57.99999999999999%
+Percent progress: 59.0%
+Percent progress: 60.0%
+Percent progress: 61.0%
+Percent progress: 62.0%
+Percent progress: 63.0%
+Percent progress: 64.0%
+Percent progress: 65.0%
+Percent progress: 66.0%
+Percent progress: 67.0%
+Percent progress: 68.0%
+Percent progress: 69.0%
+Percent progress: 70.0%
+Percent progress: 71.0%
+Percent progress: 72.0%
+Percent progress: 73.0%
+Percent progress: 74.0%
+Percent progress: 75.0%
+Percent progress: 76.0%
+Percent progress: 77.0%
+Percent progress: 78.0%
+Percent progress: 79.0%
+Percent progress: 80.0%
+Percent progress: 81.0%
+Percent progress: 82.0%
+Percent progress: 83.0%
+Percent progress: 84.0%
+Percent progress: 85.0%
+Percent progress: 86.0%
+Percent progress: 87.0%
+Percent progress: 88.0%
+Percent progress: 89.0%
+Percent progress: 90.0%
+Percent progress: 91.0%
+Percent progress: 92.0%
+Percent progress: 93.0%
+Percent progress: 94.0%
+Percent progress: 95.0%
+Percent progress: 96.0%
+Percent progress: 97.0%
+Percent progress: 98.0%
+Percent progress: 99.0%
+Percent progress: 100.0%
+0%
+10%
+20%
+30%
+40%
+50%
+60%
+70%
+80%
+90%
+Values with 11 values:
+Value 1: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 2: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 3: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 4: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 5: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 6: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 7: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 8: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 9: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 10: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+Value 11: (gtsam::Pose3)
+R: [
+	1, 0, 0;
+	0, 1, 0;
+	0, 0, 1
+]
+t: 0 0 0
+
+
+Traceback (most recent call last):
+  File "poseslam.py", line 37, in <module>
+    optimizer = gtsam.GaussNewtonOptimizer(graph, initial_estimate)
+RuntimeError: Attempting to at the key "x0", which does not exist in the Values.

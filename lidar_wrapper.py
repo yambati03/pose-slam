@@ -19,7 +19,7 @@ class LidarWrapper:
         self.baseTlaser = gtsam.Pose3()
         self.list_of_pointclouds = []
         self.lidar3d_lock = Lock()
-    
+   
     def load_pointclouds(self, path_to_bag: str):
         bag = rosbag.Bag(path_to_bag)
         topics=['/os1_cloud_node/points']
@@ -81,10 +81,13 @@ class LidarWrapper:
         aTb = gtsam.Pose3(aTb_matrix)
         factor = gtsam.BetweenFactorPose3(
             X(a), X(b), aTb, self.icp_noise_model)
-
+        
+        if a == 0 and b == 1:
+            wTb_estimate = aTb
         # Calculate the wTb pose estimate.
-        wTa = self.optimizer.results.atPose3(X(a))
-        wTb_estimate = wTa.compose(aTb)
+        else:
+            wTa = self.optimizer.results.atPose3(X(a))
+            wTb_estimate = wTa.compose(aTb)
 
         return factor, wTb_estimate
     
@@ -120,13 +123,13 @@ class LidarWrapper:
         )
         self.optimizer.add_factor(factor, (X(index_b), wTb_estimate))
         self.optimizer.optimize()
-        self.submap_clouds.append(cloud_b)
+        # self.submap_clouds.append(cloud_b)
 
         # Create skip connections to create a denser graph.
-        with self.lidar3d_lock:
-            submap = self.submap_clouds.copy()
-        if len(submap) > 2:
-            self.optimizer.optimize()
+        # with self.lidar3d_lock:
+            # submap = self.submap_clouds.copy()
+        # if len(submap) > 2:
+            # self.optimizer.optimize()
         self.state_index += 1
 
 
