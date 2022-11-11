@@ -56,6 +56,7 @@ class LidarWrapper:
         """
 
         # Calculate the ICP initial estimate if not given.
+        print(a, b)
         if not aTb_estimate:
             if self.optimizer.results.exists(X(b)):
                 wTa = self.optimizer.results.atPose3(X(a))
@@ -68,26 +69,29 @@ class LidarWrapper:
                 wTq = self.optimizer.results.atPose3(X(b-1))
                 aTb_estimate = wTp.between(wTq)
         # Use multithreaded GICP to calculate the rigid body transform.
+        cloud_a = np.array(cloud_a)
+        cloud_b = np.array(cloud_b)
+        if np.array(cloud_a).shape[1] != 3:
+            cloud_a = cloud_a.T
+        if np.array(cloud_b).shape[1] != 3:
+            cloud_b = cloud_b.T
         aTb_matrix = pygicp.align_points(
-            cloud_a,
-            cloud_b,
+            np.array(cloud_a),
+            np.array(cloud_b),
             max_correspondence_distance=self.correspondence_threshold,
             initial_guess=aTb_estimate.matrix(),
             k_correspondences=15,
             num_threads=2
         )
 
+
         # Convert back into Pose3 object.
         aTb = gtsam.Pose3(aTb_matrix)
         factor = gtsam.BetweenFactorPose3(
             X(a), X(b), aTb, self.icp_noise_model)
         
-        if a == 0 and b == 1:
-            wTb_estimate = aTb
-        # Calculate the wTb pose estimate.
-        else:
-            wTa = self.optimizer.results.atPose3(X(a))
-            wTb_estimate = wTa.compose(aTb)
+        wTa = self.optimizer.results.atPose3(X(a))
+        wTb_estimate = wTa.compose(aTb)
 
         return factor, wTb_estimate
     
@@ -105,7 +109,7 @@ class LidarWrapper:
 
 
         cloud_b = self.list_of_pointclouds[index_b] 
-        # cloud_b = self.baseTlaser.transformFrom(cloud_b)
+        cloud_b = self.baseTlaser.transformFrom(np.array(cloud_b).T)
 
         # Ignore if is the first received measurement.
         if len(self.submap_clouds) == 0:
@@ -123,13 +127,13 @@ class LidarWrapper:
         )
         self.optimizer.add_factor(factor, (X(index_b), wTb_estimate))
         self.optimizer.optimize()
-        # self.submap_clouds.append(cloud_b)
+        self.submap_clouds.append(cloud_b)
 
         # Create skip connections to create a denser graph.
-        # with self.lidar3d_lock:
-            # submap = self.submap_clouds.copy()
-        # if len(submap) > 2:
-            # self.optimizer.optimize()
+        with self.lidar3d_lock:
+            submap = self.submap_clouds.copy()
+        if len(submap) > 2:
+            self.optimizer.optimize()
         self.state_index += 1
 
 

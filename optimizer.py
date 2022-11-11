@@ -19,9 +19,13 @@ class Optimizer:
         # Instantiate factor graph data structures.
         self.isam = gtsam.ISAM2(gtsam.ISAM2Params())
         self.graph = gtsam.NonlinearFactorGraph()
+        prior_model = gtsam.noiseModel.Diagonal.Sigmas(np.random.rand(6, 1))
+        self.graph.add(gtsam.PriorFactorPose3(X(0), gtsam.Pose3(), prior_model))
+
         self.initial_estimates = gtsam.Values()
         self.results = gtsam.Values()
-
+        self.results.insert(X(0), gtsam.Pose3())
+        self.initial_estimates.insert(X(0), gtsam.Pose3())
         # Instantiate publishers.
         self.pose_publisher = rospy.Publisher(
             "/pose_estimate", PoseStamped, queue_size=5
@@ -40,52 +44,52 @@ class Optimizer:
 
     ###################### Optimization Functions ######################
 
-    def add_prior_factors(self):
-        """Parse the parameters and add prior factors to the graph."""
-
-        # Parse the prior pose estimate and standard deviations parameters.
-        prior_pose_estimate = rospy.get_param('/prior_pose_estimate')
-        prior_pose_sigmas = rospy.get_param('/prior_pose_sigmas')
-        rpy = np.deg2rad(prior_pose_estimate[3:])
-        pose_rotation = gtsam.Rot3.Ypr(*(rpy[::-1]))
-        pose_translation = gtsam.Point3(*prior_pose_estimate[:3])
-        prior_pose_estimate = gtsam.Pose3(pose_rotation, pose_translation)
-        prior_pose_noise = gtsam.noiseModel.Diagonal.Sigmas(
-            np.concatenate(
-                (np.deg2rad(prior_pose_sigmas[3:]), prior_pose_sigmas[:3]))
-        )
-
-        # Create a GTSAM PriorFactorPose3 and add the factor to the factor graph.
-        prior_pose_factor = gtsam.PriorFactorPose3(
-            X(0), prior_pose_estimate, prior_pose_noise)
-        self.add_factor(prior_pose_factor, (X(0), prior_pose_factor.prior()))
-
-        # Parse and add velocity and bias priors if using an IMU for SLAM.
-        if rospy.get_param('/use_imu'):
-            # Parse the velocity parameters and create a GTSAM velocity factor.
-            prior_vel_estimate = rospy.get_param('/imu/prior_vel_estimate')
-            prior_vel_sigmas = rospy.get_param('/imu/prior_vel_sigmas')
-            prior_vel_estimate = np.array(prior_vel_estimate)
-            prior_vel_noise = gtsam.noiseModel.Diagonal.Sigmas(
-                np.array(prior_vel_sigmas))
-            prior_vel_factor = gtsam.PriorFactorVector(
-                V(0), prior_vel_estimate, prior_vel_noise)
-
-            # Parse the bias parameters and create a GTSAM bias factor.
-            prior_bias_estimate = rospy.get_param('/imu/prior_bias_estimate')
-            prior_bias_sigmas = rospy.get_param('/imu/prior_bias_sigmas')
-            accel_bias, gyro_bias = prior_bias_estimate[:3], prior_bias_estimate[3:]
-            prior_bias_estimate = gtsam.imuBias.ConstantBias(
-                accel_bias, gyro_bias)
-            prior_bias_noise = gtsam.noiseModel.Diagonal.Sigmas(
-                np.array(prior_bias_sigmas))
-            prior_bias_factor = gtsam.PriorFactorConstantBias(
-                B(0), prior_bias_estimate, prior_bias_noise)
-
-            # Add the priors to the factor graph.
-            self.add_factor(prior_vel_factor, (V(0), prior_vel_factor.prior()))
-            self.add_factor(prior_bias_factor, (B(0), prior_bias_factor.prior()))
-        self.optimize()
+    # def add_prior_factors(self):
+    #     """Parse the parameters and add prior factors to the graph."""
+    #
+    #     # Parse the prior pose estimate and standard deviations parameters.
+    #     prior_pose_estimate = rospy.get_param('/prior_pose_estimate')
+    #     prior_pose_sigmas = rospy.get_param('/prior_pose_sigmas')
+    #     rpy = np.deg2rad(prior_pose_estimate[3:])
+    #     pose_rotation = gtsam.Rot3.Ypr(*(rpy[::-1]))
+    #     pose_translation = gtsam.Point3(*prior_pose_estimate[:3])
+    #     prior_pose_estimate = gtsam.Pose3(pose_rotation, pose_translation)
+    #     prior_pose_noise = gtsam.noiseModel.Diagonal.Sigmas(
+    #         np.concatenate(
+    #             (np.deg2rad(prior_pose_sigmas[3:]), prior_pose_sigmas[:3]))
+    #     )
+    #
+    #     # Create a GTSAM PriorFactorPose3 and add the factor to the factor graph.
+    #     prior_pose_factor = gtsam.PriorFactorPose3(
+    #         X(0), prior_pose_estimate, prior_pose_noise)
+    #     self.add_factor(prior_pose_factor, (X(0), prior_pose_factor.prior()))
+    #
+    #     # Parse and add velocity and bias priors if using an IMU for SLAM.
+    #     if rospy.get_param('/use_imu'):
+    #         # Parse the velocity parameters and create a GTSAM velocity factor.
+    #         prior_vel_estimate = rospy.get_param('/imu/prior_vel_estimate')
+    #         prior_vel_sigmas = rospy.get_param('/imu/prior_vel_sigmas')
+    #         prior_vel_estimate = np.array(prior_vel_estimate)
+    #         prior_vel_noise = gtsam.noiseModel.Diagonal.Sigmas(
+    #             np.array(prior_vel_sigmas))
+    #         prior_vel_factor = gtsam.PriorFactorVector(
+    #             V(0), prior_vel_estimate, prior_vel_noise)
+    #
+    #         # Parse the bias parameters and create a GTSAM bias factor.
+    #         prior_bias_estimate = rospy.get_param('/imu/prior_bias_estimate')
+    #         prior_bias_sigmas = rospy.get_param('/imu/prior_bias_sigmas')
+    #         accel_bias, gyro_bias = prior_bias_estimate[:3], prior_bias_estimate[3:]
+    #         prior_bias_estimate = gtsam.imuBias.ConstantBias(
+    #             accel_bias, gyro_bias)
+    #         prior_bias_noise = gtsam.noiseModel.Diagonal.Sigmas(
+    #             np.array(prior_bias_sigmas))
+    #         prior_bias_factor = gtsam.PriorFactorConstantBias(
+    #             B(0), prior_bias_estimate, prior_bias_noise)
+    #
+    #         # Add the priors to the factor graph.
+    #         self.add_factor(prior_vel_factor, (V(0), prior_vel_factor.prior()))
+    #         self.add_factor(prior_bias_factor, (B(0), prior_bias_factor.prior()))
+    #     self.optimize()
 
     def add_factor(self, factor, init_estimate_pairs=None):
         """Add a factor and initial estimates to the optimizer queue.
@@ -121,6 +125,7 @@ class Optimizer:
 
         # Clear the graph and initial estimates.
         self.graph = gtsam.NonlinearFactorGraph()
+        self.graph.add(gtsam.PriorFactorPose3(X(0), self.results.atPose3(X(0)), gtsam.noiseModel.Isotropic.Sigma(6, 1e-5)))
         self.initial_estimates.clear()
 
     ###################### Callbacks ######################
@@ -163,7 +168,6 @@ class Optimizer:
         serialized_str = self.results.serialize()
         self.results.clear()
         self.isam = gtsam.ISAM2(gtsam.ISAM2Params())
-        self.add_prior_factors()
         rospy.loginfo("Results cleared")
         return serialized_str
 
